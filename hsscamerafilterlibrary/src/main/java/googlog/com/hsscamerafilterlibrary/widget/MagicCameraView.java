@@ -233,8 +233,8 @@ public class MagicCameraView extends MagicBaseView {
             filter.onDisplaySizeChanged(width, height);
         }
         GLES20.glGenFramebuffers(1, mFrameBuffers, 0);
-        GLES20.glGenTextures(1, mFrameBufferTextures, 0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mFrameBufferTextures[0]);
+        GLES20.glGenTextures(1, mFrameBufferTextures, 0);//生成一个纹理
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mFrameBufferTextures[0]);//把已经处理好的Texture传到GL上面
         GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0,
                 GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
@@ -269,10 +269,10 @@ public class MagicCameraView extends MagicBaseView {
             beautyFilter.onDrawFrame(textureId, gLCubeBuffer, gLTextureBuffer);
         }else{
             beautyFilter.onDrawFrame(textureId);
-            filter.onDrawFrame(mFrameBufferTextures[0], gLCubeBuffer, gLTextureBuffer);
+            filter.onDrawFrame(textureId, gLCubeBuffer, gLTextureBuffer);
         }
         IntBuffer ib = IntBuffer.allocate(width * height);
-        GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, ib);
+        GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, ib);//获取原始像素
         Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         result.copyPixelsFromBuffer(ib);
 
