@@ -41,7 +41,7 @@ public class MagicBeautyFilter extends GPUImageFilter{
 
     public void setBeautyLevel(int level){
         switch (level) {
-            case 1:
+            /*case 1:
                 setFloat(mParamsLocation, 1.0f);
                 break;
             case 2:
@@ -55,7 +55,22 @@ public class MagicBeautyFilter extends GPUImageFilter{
                 break;
             case 5:
                 setFloat(mParamsLocation,0.33f);
-                break;
+                break;*/
+            case 1:
+		setFloatVec4(mParamsLocation, new float[] {1.0f, 1.0f, 0.15f, 0.15f});
+		break;
+	    case 2:
+		setFloatVec4(mParamsLocation, new float[] {0.8f, 0.9f, 0.2f, 0.2f});
+		break;
+	    case 3:
+		setFloatVec4(mParamsLocation, new float[] {0.6f, 0.8f, 0.25f, 0.25f});
+		break;
+	    case 4:
+		setFloatVec4(mParamsLocation, new float[] {0.4f, 0.7f, 0.38f, 0.3f});
+	        break;
+	    case 5:
+		setFloatVec4(mParamsLocation, new float[] {0.33f, 0.63f, 0.4f, 0.35f});
+		break;
             default:
                 break;
         }
