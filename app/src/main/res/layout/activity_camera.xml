@@ -46,6 +46,14 @@
             android:paddingBottom="5dip"
             android:layout_alignParentBottom="true">
             <ImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="1.0"
+                android:src="@drawable/btn_camera_beauty"
+                android:scaleType="center">
+            </ImageView>
+            <ImageView
                 android:id="@+id/btn_camera_beauty"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
@@ -65,6 +73,14 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1.0"
                 android:scaleType="center"
+                android:id="@+id/btn_camera_ratio"
+                android:src="@drawable/btn_camera_filter">
+            </ImageView>
+            <ImageView
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="1.0"
+                android:scaleType="center"
                 android:id="@+id/btn_camera_filter"
                 android:src="@drawable/btn_camera_filter">
             </ImageView>
@@ -72,6 +88,13 @@
         <include
             android:id="@+id/layout_filter"
             layout="@layout/filter_layout"
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"/>
+        <include
+            android:id="@+id/layout_ratio"
+            layout="@layout/ratio_layout"
             android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

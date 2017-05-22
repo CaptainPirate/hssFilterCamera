@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import googlog.com.hsscamera.R;
 import googlog.com.hsscamera.adapter.FilterAdapter;
@@ -37,6 +38,7 @@ import java.util.Locale;
  */
 public class CameraActivity extends Activity{
     private LinearLayout mFilterLayout;
+    private LinearLayout mRatioLayout;
     private RecyclerView mFilterListView;
     private FilterAdapter mAdapter;
     private MagicEngine magicEngine;
@@ -47,7 +49,10 @@ public class CameraActivity extends Activity{
 
     private ImageView btn_shutter;
     private ImageView btn_mode;
+    private ImageView btn_camera_ratio;
 
+    private TextView ratio_4_3;
+    private TextView ratio_16_9;
     private ObjectAnimator animator;
 
     private final MagicFilterType[] types = new MagicFilterType[]{
@@ -107,10 +112,11 @@ public class CameraActivity extends Activity{
 
     private void initView(){
         mFilterLayout = (LinearLayout)findViewById(R.id.layout_filter);
+        mRatioLayout = (LinearLayout)findViewById(R.id.layout_ratio);
         mFilterListView = (RecyclerView) findViewById(R.id.filter_listView);
 
         btn_shutter = (ImageView)findViewById(R.id.btn_camera_shutter);
-        btn_mode = (ImageView)findViewById(R.id.btn_camera_mode);
+        btn_mode = (ImageView)findViewById(R.id.btn_camera_mode);       
 
         findViewById(R.id.btn_camera_filter).setOnClickListener(btn_listener);
         findViewById(R.id.btn_camera_closefilter).setOnClickListener(btn_listener);
@@ -118,7 +124,11 @@ public class CameraActivity extends Activity{
         findViewById(R.id.btn_camera_switch).setOnClickListener(btn_listener);
         findViewById(R.id.btn_camera_mode).setOnClickListener(btn_listener);
         findViewById(R.id.btn_camera_beauty).setOnClickListener(btn_listener);
-
+        findViewById(R.id.btn_camera_ratio).setOnClickListener(btn_listener);   
+        findViewById(R.id.ratio_4_3).setOnClickListener(btn_listener); 
+        findViewById(R.id.ratio_16_9).setOnClickListener(btn_listener); 
+        findViewById(R.id.btn_camera_closeratio).setOnClickListener(btn_listener);
+        
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mFilterListView.setLayoutManager(linearLayoutManager);
@@ -138,7 +148,20 @@ public class CameraActivity extends Activity{
         params.height = screenSize.x * 16 / 9;
         cameraView.setLayoutParams(params);
     }
-
+    private void setPreviewSize(int ratio){
+        
+        Point screenSize = new Point();
+        getWindowManager().getDefaultDisplay().getSize(screenSize);
+        MagicCameraView cameraView = (MagicCameraView)findViewById(R.id.glsurfaceview_camera);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) cameraView.getLayoutParams();
+        params.width = screenSize.x;
+        if(ratio==43){
+           params.height = screenSize.x * 4 / 3;
+        }else if(ratio==169){
+           params.height = screenSize.x * 16 / 9;
+        }
+        cameraView.setLayoutParams(params);
+    }
     private FilterAdapter.onFilterChangeListener onFilterChangeListener = new FilterAdapter.onFilterChangeListener(){
 
         @Override
@@ -198,8 +221,20 @@ public class CameraActivity extends Activity{
                             .setNegativeButton("取消", null)
                             .show();
                     break;
+                case R.id.btn_camera_ratio:
+                     showRatio();//layout_ratio
+                    break;
+                case R.id.ratio_4_3:
+                    setPreviewSize(43);
+                    break;
+                case R.id.ratio_16_9:
+                    setPreviewSize(169);
+                    break;
                 case R.id.btn_camera_closefilter:
                     hideFilters();
+                    break;
+                case R.id.btn_camera_closeratio:
+                    hideRatios();
                     break;
             }
         }
@@ -259,6 +294,35 @@ public class CameraActivity extends Activity{
         animator.start();
     }
 
+    private void showRatio(){
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mRatioLayout, "translationY", mRatioLayout.getHeight(), 0);
+        animator.setDuration(200);
+        animator.addListener(new Animator.AnimatorListener() {
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                findViewById(R.id.btn_camera_shutter).setClickable(false);
+                mRatioLayout.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+        });
+        animator.start();
+    }
+
     private void hideFilters(){
         ObjectAnimator animator = ObjectAnimator.ofFloat(mFilterLayout, "translationY", 0 ,  mFilterLayout.getHeight());
         animator.setDuration(200);
@@ -291,7 +355,38 @@ public class CameraActivity extends Activity{
         });
         animator.start();
     }
+    private void hideRatios(){
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mRatioLayout, "translationY", 0 ,  mRatioLayout.getHeight());
+        animator.setDuration(200);
+        animator.addListener(new Animator.AnimatorListener() {
 
+            @Override
+            public void onAnimationStart(Animator animation) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                // TODO Auto-generated method stub
+                mRatioLayout.setVisibility(View.INVISIBLE);
+                findViewById(R.id.btn_camera_shutter).setClickable(true);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                // TODO Auto-generated method stub
+                mRatioLayout.setVisibility(View.INVISIBLE);
+                findViewById(R.id.btn_camera_shutter).setClickable(true);
+            }
+        });
+        animator.start();
+    }
     public File getOutputMediaFile() {
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "MagicCamera");

@@ -59,4 +59,6 @@
 	<string name="edit_sharpness">Sharpness</string>
 	<string name="edit_brightness">Bright</string>
 	<string name="edit_hue">Hue</string>
+        <string name="ratio_4_3">4:3</string>
+        <string name="ratio_16_9">16:9</string>
 </resources>
