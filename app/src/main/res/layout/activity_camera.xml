@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,10 +6,11 @@
     tools:context="googlog.com.hsscamera.activity.CameraActivity" >
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
         <googlog.com.hsscamerafilterlibrary.widget.MagicCameraView
             android:id="@+id/glsurfaceview_camera"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <LinearLayout
             android:layout_width="wrap_content"
@@ -34,15 +35,16 @@
     </RelativeLayout>
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
         <LinearLayout
+            android:id="@+id/content_background"
             android:layout_width="match_parent"
             android:layout_gravity="bottom"
             android:layout_height="120.0dip"
             android:paddingTop="5dip"
             android:paddingBottom="5dip"
-            android:layout_alignParentBottom="true"
-            android:background="@android:color/white">
+            android:layout_alignParentBottom="true">
             <ImageView
                 android:id="@+id/btn_camera_beauty"
                 android:layout_width="0dip"
@@ -75,4 +77,4 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"/>
     </FrameLayout>
-</LinearLayout>
+</RelativeLayout>

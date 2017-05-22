@@ -18,6 +18,7 @@ package googlog.com.hsscamerafilterlibrary.filter.base.gpuimage;
 
 import android.graphics.PointF;
 import android.opengl.GLES20;
+import android.util.Log;
 
 import googlog.com.hsscamerafilterlibrary.utils.OpenGlUtils;
 import googlog.com.hsscamerafilterlibrary.utils.Rotation;
@@ -29,6 +30,7 @@ import java.nio.FloatBuffer;
 import java.util.LinkedList;
 
 public class GPUImageFilter {
+    public static String TAG = "GPUImageFilter";
     public static final String NO_FILTER_VERTEX_SHADER = "" +
             "attribute vec4 position;\n" +
             "attribute vec4 inputTextureCoordinate;\n" +
@@ -92,6 +94,7 @@ public class GPUImageFilter {
     }
 
     protected void onInit() {
+        Log.d(TAG,"onInit");
         mGLProgId = OpenGlUtils.loadProgram(mVertexShader, mFragmentShader);
         mGLAttribPosition = GLES20.glGetAttribLocation(mGLProgId, "position");
         mGLUniformTexture = GLES20.glGetUniformLocation(mGLProgId, "inputImageTexture");

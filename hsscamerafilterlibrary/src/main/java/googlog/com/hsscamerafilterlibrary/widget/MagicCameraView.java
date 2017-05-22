@@ -9,6 +9,7 @@ import android.opengl.EGL14;
 import android.opengl.GLES20;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
+import android.widget.FrameLayout;
 
 import googlog.com.hsscamerafilterlibrary.camera.CameraEngine;
 import googlog.com.hsscamerafilterlibrary.camera.utils.CameraInfo;
@@ -171,7 +172,7 @@ public class MagicCameraView extends MagicBaseView {
             imageWidth = info.previewWidth;
             imageHeight = info.previewHeight;
         }
-        cameraInputFilter.onInputSizeChanged(imageWidth, imageHeight);
+        cameraInputFilter.onInputSizeChanged(imageWidth, imageHeight);//图片尺寸
         adjustSize(info.orientation, info.isFront, true);
         if(surfaceTexture != null)
             CameraEngine.startPreview(surfaceTexture);
@@ -292,5 +293,22 @@ public class MagicCameraView extends MagicBaseView {
 
     public void onBeautyLevelChanged() {
         cameraInputFilter.onBeautyLevelChanged();
+    }
+
+    private void setLayoutSize(int width, int height,int mPreviewWidth, int mPreviewHeight) {
+       /* Log.d("MagicCameraView", "setLayoutSize mPreviewWidth = " + mPreviewWidth
+                + " width = " + width
+                + " mPreviewHeight = " + mPreviewHeight
+                + " height = " + height);*/
+        if (width <= 0 || height <= 0 || mPreviewWidth <= 0 || mPreviewWidth <= 0) {
+            return;
+        }
+        FrameLayout.LayoutParams p = (FrameLayout.LayoutParams) getLayoutParams();
+        if (p.width != width || p.height != height) {
+            p.width = width;
+            p.height = height;
+            p.setMargins(mPreviewWidth - width, mPreviewHeight - height, 0, 0);//left,top,right,bottom
+            setLayoutParams(p);
+        }
     }
 }

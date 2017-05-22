@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
+import android.util.Log;
 
 import googlog.com.hsscamerafilterlibrary.R;
 import googlog.com.hsscamerafilterlibrary.filter.base.gpuimage.GPUImageFilter;
@@ -11,7 +12,7 @@ import googlog.com.hsscamerafilterlibrary.utils.MagicParams;
 import googlog.com.hsscamerafilterlibrary.utils.OpenGlUtils;
 
 public class MagicCameraInputFilter extends GPUImageFilter{
-
+    public static String TAG = "MagicCameraInputFilter";
     private float[] mTextureTransformMatrix;
     private int mTextureTransformMatrixLocation;
     private int mSingleStepOffsetLocation;
@@ -28,7 +29,9 @@ public class MagicCameraInputFilter extends GPUImageFilter{
     }
 
     protected void onInit() {
+        Log.d(TAG,"onInit1");
         super.onInit();
+        Log.d(TAG,"onInit2");
         mTextureTransformMatrixLocation = GLES20.glGetUniformLocation(mGLProgId, "textureTransform");
         mSingleStepOffsetLocation = GLES20.glGetUniformLocation(getProgram(), "singleStepOffset");
         mParamsLocation = GLES20.glGetUniformLocation(getProgram(), "params");
@@ -183,24 +186,42 @@ public class MagicCameraInputFilter extends GPUImageFilter{
 
     public void setBeautyLevel(int level){
         switch (level) {
+//            case 0:
+//                setFloat(mParamsLocation, 0.0f);
+//                break;
+//            case 1:
+//                setFloat(mParamsLocation, 1.0f);
+//                break;
+//            case 2:
+//                setFloat(mParamsLocation, 0.8f);
+//                break;
+//            case 3:
+//                setFloat(mParamsLocation,0.6f);
+//                break;
+//            case 4:
+//                setFloat(mParamsLocation, 0.4f);
+//                break;
+//            case 5:
+//                setFloat(mParamsLocation,0.33f);
+//                break;case 1:
             case 0:
-                setFloat(mParamsLocation, 0.0f);
-                break;
+            setFloatVec2(mParamsLocation, new float[] {0.0f, 1.0f});//float[] {0.0f, 1.0f, 0.15f, 0.15f});
+            break;
             case 1:
-                setFloat(mParamsLocation, 1.0f);
-                break;
+            setFloatVec2(mParamsLocation, new float[] {1.0f, 1.0f});//float[] {1.0f, 1.0f, 0.15f, 0.15f});
+            break;
             case 2:
-                setFloat(mParamsLocation, 0.8f);
-                break;
+            setFloatVec2(mParamsLocation, new float[] {0.8f, 0.9f});//float[] {0.8f, 0.9f, 0.2f, 0.2f});
+            break;
             case 3:
-                setFloat(mParamsLocation,0.6f);
-                break;
+            setFloatVec2(mParamsLocation, new float[] {0.6f, 0.8f});//float[] {0.6f, 0.8f, 0.25f, 0.25f});
+            break;
             case 4:
-                setFloat(mParamsLocation, 0.4f);
+            setFloatVec2(mParamsLocation, new float[] {0.4f, 0.7f});//float[] {0.4f, 0.7f, 0.38f, 0.3f});
                 break;
             case 5:
-                setFloat(mParamsLocation,0.33f);
-                break;
+            setFloatVec2(mParamsLocation, new float[] {0.33f, 0.63f});//float[] {0.33f, 0.63f, 0.4f, 0.35f});
+            break;
             default:
                 break;
         }
