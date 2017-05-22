@@ -1,0 +1,10 @@
+# git ignore
+xcuserdata
+.DS_Store
+*.mdb  
+*.ldb  
+*.sln  
+*.config
+*.bin
+app/.externalNativeBuild/
+build/
