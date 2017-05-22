@@ -6,5 +6,5 @@ xcuserdata
 *.sln  
 *.config
 *.bin
-app/.externalNativeBuild/
+/app/.externalNativeBuild/
 build/
