@@ -92,6 +92,32 @@ public class CameraEngine {
         camera.setParameters(parameters);
     }
 
+    public static synchronized void setNewParameters(int ratio){
+        Parameters parameters = camera.getParameters();
+        Size previewSize;
+        Size pictureSize;
+        if (parameters.getSupportedFocusModes().contains(
+                Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+            parameters.setFocusMode(Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        }
+
+        if(ratio==43){
+		previewSize = CameraUtils.getLargePreviewSize(camera);
+		parameters.setPreviewSize(previewSize.width, previewSize.height);
+		pictureSize = CameraUtils.getLargePictureSize(camera);
+		parameters.setPictureSize(pictureSize.width, pictureSize.height);
+		parameters.setRotation(90);
+		camera.setParameters(parameters);
+        }else{
+		previewSize = CameraUtils.getLargePreviewSize_16_9(camera);
+		parameters.setPreviewSize(previewSize.width, previewSize.height);
+		pictureSize = CameraUtils.getLargePictureSize_16_9(camera);
+		parameters.setPictureSize(pictureSize.width, pictureSize.height);
+		parameters.setRotation(90);
+		camera.setParameters(parameters);
+        }
+    }
+
     private static Size getPreviewSize(){
         return camera.getParameters().getPreviewSize();
     }
