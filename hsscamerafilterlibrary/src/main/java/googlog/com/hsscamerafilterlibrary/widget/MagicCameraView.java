@@ -32,6 +32,7 @@ import java.nio.IntBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import android.util.Log;
 
 /**
  * Created by hss on 2016/2/25.
@@ -89,6 +90,7 @@ public class MagicCameraView extends MagicBaseView {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         super.onSurfaceChanged(gl, width, height);
+        Log.d("MagicCameraView","onSurfaceChanged");
         openCamera();
     }
 
