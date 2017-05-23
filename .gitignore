@@ -8,3 +8,9 @@ xcuserdata
 *.bin
 app/.externalNativeBuild/
 build/
+.gradle/
+.idea/
+app/app.iml
+hssFilterCamera.iml
+hsscamerafilterlibrary/hsscamerafilterlibrary.iml
+local.properties
