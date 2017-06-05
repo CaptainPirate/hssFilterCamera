@@ -1,7 +1,5 @@
 package googlog.com.hsscamerafilterlibrary.camera;
 
-import java.io.IOException;
-
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
@@ -9,30 +7,32 @@ import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
 import android.view.SurfaceView;
 
+import java.io.IOException;
+
 import googlog.com.hsscamerafilterlibrary.camera.utils.CameraUtils;
 
-public class CameraEngine {
-    private static Camera camera = null;
-    private static int cameraID = 0;
-    private static SurfaceTexture surfaceTexture;
-    private static SurfaceView surfaceView;
-    private static Parameters parameters;
-    private static CameraEngine mCameraEngine;
+public class CameraEngineInterface {
+    private  Camera camera = null;
+    private  int cameraID = 0;
+    private  SurfaceTexture surfaceTexture;
+    private  SurfaceView surfaceView;
+    private  Parameters parameters;
+    private static CameraEngineInterface mCameraEngine;
 
-    private CameraEngine(){
+    private CameraEngineInterface(){
 
     }
-    public static synchronized CameraEngine getInstance(){
+    public static synchronized CameraEngineInterface getInstance(){
         if(mCameraEngine == null){
-            mCameraEngine = new CameraEngine();
+            mCameraEngine = new CameraEngineInterface();
         }
         return mCameraEngine;
     }
-    public static Camera getCamera(){
+    public  Camera getCamera(){
         return camera;
     }
 
-    public static boolean openCamera(){
+    public  boolean openCamera(){
         if(camera == null){
             try{
                 camera = Camera.open(cameraID);
@@ -45,7 +45,7 @@ public class CameraEngine {
         return false;
     }
 
-    public static boolean openCamera(int id){
+    public  boolean openCamera(int id){
         if(camera == null){
             try{
                 camera = Camera.open(id);
@@ -59,11 +59,11 @@ public class CameraEngine {
         return false;
     }
 
-    public static int getCameraID(){
+    public  int getCameraID(){
         return cameraID;
     }
 
-    public static void releaseCamera(){
+    public  void releaseCamera(){
         if(camera != null){
             camera.setPreviewCallback(null);
             camera.stopPreview();
@@ -76,24 +76,24 @@ public class CameraEngine {
         openCamera();
     }
 
-    public static void setParameters(Parameters parameters){
+    public  void setParameters(Parameters parameters){
         camera.setParameters(parameters);
     }
 
-    public static Parameters getParameters(){
+    public  Parameters getParameters(){
         if(camera != null)
             camera.getParameters();
         return null;
     }
 
-    public static void switchCamera(){
+    public  void switchCamera(){
         releaseCamera();
         cameraID = cameraID == 0 ? 1 : 0;
         openCamera(cameraID);
         startPreview(surfaceTexture);
     }
 
-    private static void setDefaultParameters(){
+    private  void setDefaultParameters(){
         parameters = camera.getParameters();
         if (parameters.getSupportedFocusModes().contains(
                 Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
@@ -107,7 +107,7 @@ public class CameraEngine {
         camera.setParameters(parameters);
     }
 
-    public static synchronized void setNewParameters(int ratio){
+    public  synchronized void setNewParameters(int ratio){
         parameters = camera.getParameters();
         Size previewSize;
         Size pictureSize;
@@ -133,46 +133,49 @@ public class CameraEngine {
         }
     }
 
-    private static Size getPreviewSize(){
+    public  Size getPreviewSize(){
+        /*if(camera==null){
+            openCamera();
+        }*/
         return camera.getParameters().getPreviewSize();
     }
 
-    private static Size getPictureSize(){
+    public  Size getPictureSize(){
         return camera.getParameters().getPictureSize();
     }
 
-    public static void startPreview(SurfaceTexture surfaceTexture){
+    public  void startPreview(SurfaceTexture surfaceTexture){
         if(camera != null)
             try {
                 camera.setPreviewTexture(surfaceTexture);
-                CameraEngine.surfaceTexture = surfaceTexture;
+                this.surfaceTexture = surfaceTexture;
                 camera.startPreview();
             } catch (IOException e) {
                 e.printStackTrace();
             }
     }
 
-    public static void startPreview(){
+    public  void startPreview(){
         if(camera != null)
             camera.startPreview();
     }
 
-    public static void stopPreview(){
+    public  void stopPreview(){
         camera.stopPreview();
     }
 
-    public static void setRotation(int rotation){
+    public  void setRotation(int rotation){
         Parameters params = camera.getParameters();
         params.setRotation(rotation);
         camera.setParameters(params);
     }
 
-    public static void takePicture(Camera.ShutterCallback shutterCallback, Camera.PictureCallback rawCallback,
+    public  void takePicture(Camera.ShutterCallback shutterCallback, Camera.PictureCallback rawCallback,
                                    Camera.PictureCallback jpegCallback){
         camera.takePicture(shutterCallback, rawCallback, jpegCallback);
     }
 
-    public static googlog.com.hsscamerafilterlibrary.camera.utils.CameraInfo getCameraInfo(){
+    public  googlog.com.hsscamerafilterlibrary.camera.utils.CameraInfo getCameraInfo(){
         googlog.com.hsscamerafilterlibrary.camera.utils.CameraInfo info = new googlog.com.hsscamerafilterlibrary.camera.utils.CameraInfo();
         Size size = getPreviewSize();
         CameraInfo cameraInfo = new CameraInfo();

@@ -2,7 +2,7 @@ package googlog.com.hsscamerafilterlibrary;
 
 import android.content.Context;
 
-import googlog.com.hsscamerafilterlibrary.camera.CameraEngine;
+import googlog.com.hsscamerafilterlibrary.camera.CameraEngineInterface;
 import googlog.com.hsscamerafilterlibrary.filter.helper.MagicFilterType;
 import googlog.com.hsscamerafilterlibrary.utils.MagicParams;
 import googlog.com.hsscamerafilterlibrary.helper.SavePictureTask;
@@ -55,7 +55,7 @@ public class MagicEngine {
     }
 
     public void switchCamera(){
-        CameraEngine.switchCamera();
+        CameraEngineInterface.getInstance().switchCamera();
     }
 
     public static class Builder{

@@ -11,7 +11,7 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.widget.FrameLayout;
 
-import googlog.com.hsscamerafilterlibrary.camera.CameraEngine;
+import googlog.com.hsscamerafilterlibrary.camera.CameraEngineInterface;
 import googlog.com.hsscamerafilterlibrary.camera.utils.CameraInfo;
 import googlog.com.hsscamerafilterlibrary.encoder.video.TextureMovieEncoder;
 import googlog.com.hsscamerafilterlibrary.filter.advanced.MagicBeautyFilter;
@@ -44,6 +44,7 @@ public class MagicCameraView extends MagicBaseView {
 
     private SurfaceTexture surfaceTexture;
 
+    private SurfaceHolder mSurfaceHolder;
     public MagicCameraView(Context context) {
         this(context, null);
     }
@@ -103,7 +104,7 @@ public class MagicCameraView extends MagicBaseView {
         if (recordingEnabled) {
             switch (recordingStatus) {
                 case RECORDING_OFF:
-                    CameraInfo info = CameraEngine.getCameraInfo();
+                    CameraInfo info = CameraEngineInterface.getInstance().getCameraInfo();
                     videoEncoder.setPreviewSize(info.previewWidth, info.pictureHeight);
                     videoEncoder.setTextureBuffer(gLTextureBuffer);
                     videoEncoder.setCubeBuffer(gLCubeBuffer);
@@ -164,9 +165,9 @@ public class MagicCameraView extends MagicBaseView {
     }
 
     private void openCamera(){
-        if(CameraEngine.getCamera() == null)
-            CameraEngine.openCamera();
-        CameraInfo info = CameraEngine.getCameraInfo();
+        if(CameraEngineInterface.getInstance().getCamera() == null)
+            CameraEngineInterface.getInstance().openCamera();
+        CameraInfo info = CameraEngineInterface.getInstance().getCameraInfo();
         if(info.orientation == 90 || info.orientation == 270){
             imageWidth = info.previewHeight;
             imageHeight = info.previewWidth;
@@ -177,13 +178,13 @@ public class MagicCameraView extends MagicBaseView {
         cameraInputFilter.onInputSizeChanged(imageWidth, imageHeight);//图片尺寸
         adjustSize(info.orientation, info.isFront, true);
         if(surfaceTexture != null)
-            CameraEngine.startPreview(surfaceTexture);
+            CameraEngineInterface.getInstance().startPreview(surfaceTexture);
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         super.surfaceDestroyed(holder);
-        CameraEngine.releaseCamera();
+        CameraEngineInterface.getInstance().releaseCamera();
     }
 
     public void changeRecordingState(boolean isRecording) {
@@ -201,21 +202,21 @@ public class MagicCameraView extends MagicBaseView {
 
     @Override
     public void savePicture(final SavePictureTask savePictureTask) {
-        CameraEngine.takePicture(null, null, new Camera.PictureCallback() {
+        CameraEngineInterface.getInstance().takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
-                CameraEngine.stopPreview();
+                CameraEngineInterface.getInstance().stopPreview();
                 final Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 queueEvent(new Runnable() {
                     @Override
                     public void run() {
-                        final Bitmap photo = drawPhoto(bitmap,CameraEngine.getCameraInfo().isFront);
+                        final Bitmap photo = drawPhoto(bitmap,CameraEngineInterface.getInstance().getCameraInfo().isFront);
                         GLES20.glViewport(0, 0, surfaceWidth, surfaceHeight);
                         if (photo != null)
                             savePictureTask.execute(photo);
                     }
                 });
-                CameraEngine.startPreview();
+                CameraEngineInterface.getInstance().startPreview();
             }
         });
     }
