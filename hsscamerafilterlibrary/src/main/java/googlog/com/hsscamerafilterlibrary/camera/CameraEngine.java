@@ -155,7 +155,12 @@ public class CameraEngine {
     public static void startPreview(){
         if(camera != null)
             camera.startPreview();
+       // camera.setDisplayOrientation(getPreviewDegree(this));
     }
+
+    //camera.setDisplayOrientation(getPreviewDegree(this));//this为当前的Activity
+
+
 
     public static void stopPreview(){
         camera.stopPreview();

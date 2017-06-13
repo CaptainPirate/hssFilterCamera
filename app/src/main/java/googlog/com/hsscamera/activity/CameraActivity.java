@@ -20,7 +20,9 @@ import android.support.v4.content.PermissionChecker;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -30,6 +32,8 @@ import googlog.com.hsscamera.R;
 import googlog.com.hsscamera.adapter.FilterAdapter;
 import googlog.com.hsscamera.view.edit.facedetect.FaceView;
 import googlog.com.hsscamera.view.edit.facedetect.GoogleFaceDetect;
+import googlog.com.hsscamera.view.edit.guideline.ViewManager;
+import googlog.com.hsscamera.view.edit.manager.CameraAppUiManager;
 import googlog.com.hsscamera.widget.PreviewFrameLayout;
 import googlog.com.hsscamerafilterlibrary.MagicEngine;
 import googlog.com.hsscamerafilterlibrary.camera.CameraEngineInterface;
@@ -70,6 +74,7 @@ public class CameraActivity extends Activity implements
 
     private TextView ratio_4_3;
     private TextView ratio_16_9;
+    private int nowPreviewSize = 169;
     private ObjectAnimator animator;
 
     private int mPreviewFrameWidth;
@@ -79,6 +84,13 @@ public class CameraActivity extends Activity implements
     private MainHandler mMainHandler = null;
     GoogleFaceDetect mfacedetect = null;
     MagicCameraView cameraView;
+    private CameraAppUiManager mCameraAppUiManager;
+
+    private ViewGroup appRoot;
+
+    public interface OnOrientationListener {
+        void onOrientationChanged(int orientation);
+    }
 
     private final MagicFilterType[] types = new MagicFilterType[]{
             MagicFilterType.NONE,
@@ -134,6 +146,14 @@ public class CameraActivity extends Activity implements
         magicEngine = builder
                 .build((MagicCameraView)findViewById(R.id.glsurfaceview_camera));
         initView();
+
+
+        mCameraAppUiManager = new CameraAppUiManager(this);
+        mCameraAppUiManager.createCommonView();
+        mCameraAppUiManager.initializeViewGroup();
+//        initializeCommonManagers();
+//        mCameraAppUi.initializeCommonView();
+        updateViewForAuxiliaryLine();
         mMainHandler = new MainHandler();
         mfacedetect = new GoogleFaceDetect(getApplicationContext(),mMainHandler);
         mMainHandler.sendEmptyMessageDelayed(CAMERA_HAS_STARTED_PREVIEW, 1000);
@@ -169,6 +189,11 @@ public class CameraActivity extends Activity implements
         mFilterListView.setAdapter(mAdapter);
         mAdapter.setOnFilterChangeListener(onFilterChangeListener);
 
+        appRoot = (ViewGroup) findViewById(R.id.camera_app_root);
+        appRoot.removeAllViews();
+        getLayoutInflater().inflate(R.layout.preview_frame, appRoot, true);
+        getLayoutInflater().inflate(R.layout.view_layers, appRoot, true);
+
         animator = ObjectAnimator.ofFloat(btn_shutter,"rotation",0,360);
         animator.setDuration(500);
         animator.setRepeatCount(ValueAnimator.INFINITE);
@@ -180,12 +205,17 @@ public class CameraActivity extends Activity implements
         cameraView.setLayoutParams(params);
         mPreviewFrameLayout.setAspectRatio((double)4/3);*/
         //mPreviewFrameLayout.setOnSizeChangedListener(this);
+//        cameraView.setRotation(180);
+//        Log.d(TAG,"getCameraOrientation()"+getCameraOrientation());
+        //setCameraDisplayOrientation(this,CameraEngineInterface.getInstance().getCameraID(), CameraEngineInterface.getInstance().getCamera());
     }
 
     @Override
     public void onSizeChanged(int width, int height){
         if ((CameraEngineInterface.getInstance() != null)&&(CameraEngineInterface.getInstance().getCamera() != null) && (CameraEngineInterface.getInstance().getPreviewSize() != null)) {
+            setCameraDisplayOrientation(this,CameraEngineInterface.getInstance().getCameraID(), CameraEngineInterface.getInstance().getCamera());
             Camera.Size size = CameraEngineInterface.getInstance().getPreviewSize();
+            Log.d(TAG,"getCameraOrientation()"+getCameraOrientation());
             int w = size.width;
             int h = size.height;
             double mAspectRatio = (double) w / h;
@@ -229,14 +259,17 @@ public class CameraActivity extends Activity implements
         params.width = screenSize.x;
         paramsfaceview.width = screenSize.x;
         if(ratio==43){
-           params.height = screenSize.x * 4 / 3;
-           paramsfaceview.height = screenSize.x * 4 / 3;
+            nowPreviewSize=43;
+            params.height = screenSize.x * 4 / 3;
+            paramsfaceview.height = screenSize.x * 4 / 3;
           //  mPreviewFrameLayout.setAspectRatio((double)4/3);
         }else if(ratio==169){
-           params.height = screenSize.x * 16 / 9;
-           paramsfaceview.height = screenSize.x * 4 / 3;
+            nowPreviewSize=169;
+            params.height = screenSize.x * 16 / 9;
+            paramsfaceview.height = screenSize.x * 4 / 3;
            // mPreviewFrameLayout.setAspectRatio((double)16/9);
         }
+        updateViewForAuxiliaryLine();
         cameraView.setLayoutParams(params);
         mFaceView.setLayoutParams(paramsfaceview);
     }
@@ -278,6 +311,61 @@ public class CameraActivity extends Activity implements
             super.handleMessage(msg);
         }
 
+    }
+
+    public int getCameraOrientation() {
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo(CameraEngineInterface.getInstance().getCameraID(), info);
+        return info.orientation;
+    }
+
+    public void setCameraDisplayOrientation(Activity activity,
+              int cameraId, android.hardware.Camera camera) {
+          android.hardware.Camera.CameraInfo info =
+                  new android.hardware.Camera.CameraInfo();
+          android.hardware.Camera.getCameraInfo(cameraId, info);
+          int rotation = activity.getWindowManager().getDefaultDisplay()
+                  .getRotation();
+          int degrees = 0;
+          switch (rotation) {
+              case Surface.ROTATION_0: degrees = 0; break;
+              case Surface.ROTATION_90: degrees = 90; break;
+              case Surface.ROTATION_180: degrees = 180; break;
+             case Surface.ROTATION_270: degrees = 270; break;
+          }
+    
+         int result;
+          if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+              result = (info.orientation + degrees) % 360;
+              result = (360 - result) % 360;  // compensate the mirror
+          } else {  // back-facing
+              result = (info.orientation - degrees + 360) % 360;
+          }
+          camera.setDisplayOrientation(result);
+      }
+
+    // 提供一个静态方法，用于根据手机方向获得相机预览画面旋转的角度
+    public int getPreviewDegree(Activity activity) {
+        // 获得手机的方向
+        int rotation = activity.getWindowManager().getDefaultDisplay()
+                .getRotation();
+        int degree = 0;
+        // 根据手机的方向计算相机预览画面应该选择的角度
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degree = 90;
+                break;
+            case Surface.ROTATION_90:
+                degree = 0;
+                break;
+            case Surface.ROTATION_180:
+                degree = 270;
+                break;
+            case Surface.ROTATION_270:
+                degree = 180;
+                break;
+        }
+        return degree;
     }
 
     private View.OnClickListener btn_listener = new View.OnClickListener() {
@@ -361,6 +449,41 @@ public class CameraActivity extends Activity implements
             CameraEngineInterface.getInstance().getCamera().setFaceDetectionListener(null);
             CameraEngineInterface.getInstance().getCamera().stopFaceDetection();
             mFaceView.clearFaces();
+        }
+    }
+
+    public boolean addViewManager(ViewManager viewManager) {
+        return mCameraAppUiManager.addViewManager(viewManager);
+    }
+
+    public boolean removeViewManager(ViewManager viewManager) {
+        return mCameraAppUiManager.removeViewManager(viewManager);
+    }
+
+    public View inflate(int layoutId, int layer) {
+        return mCameraAppUiManager.inflate(layoutId, layer);
+    }
+
+    public void addView(View view, int layer) {
+        mCameraAppUiManager.addView(view, layer);
+    }
+
+    public void removeView(View view, int layer) {
+        mCameraAppUiManager.removeView(view, layer);
+    }
+
+    private void updateViewForAuxiliaryLine() {
+       // String previewRatio = mISettingCtrl.getSettingValue(SettingConstants.KEY_PICTURE_RATIO);
+        //String isShowAuxiliaryLine = mISettingCtrl.getSettingValue(SettingConstants.KEY_INFINIX_GUIDELINES);
+        //if(isShowAuxiliaryLine != null && isShowAuxiliaryLine.equals("on")){
+        if(true){
+            if (nowPreviewSize==169) {
+                mCameraAppUiManager.getAuxiliarylineManager().showAuxiliaryline(R.drawable.pl_setting_auxiliary_line_16_9);
+            } else if (nowPreviewSize==43) {
+                mCameraAppUiManager.getAuxiliarylineManager().showAuxiliaryline(R.drawable.pl_setting_auxiliary_line_4_3);
+            }
+        }else{
+            mCameraAppUiManager.getAuxiliarylineManager().hide();
         }
     }
 

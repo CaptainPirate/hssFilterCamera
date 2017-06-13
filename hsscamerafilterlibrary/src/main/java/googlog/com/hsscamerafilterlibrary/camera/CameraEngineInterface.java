@@ -5,6 +5,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
+import android.util.Log;
 import android.view.SurfaceView;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import googlog.com.hsscamerafilterlibrary.camera.utils.CameraUtils;
 
 public class CameraEngineInterface {
+    private static String TAG = "CameraEngineInterFace";
     private  Camera camera = null;
     private  int cameraID = 0;
     private  SurfaceTexture surfaceTexture;
@@ -37,6 +39,7 @@ public class CameraEngineInterface {
             try{
                 camera = Camera.open(cameraID);
                 setDefaultParameters();
+       // camera.setDisplayOrientation(270);
                 return true;
             }catch(RuntimeException e){
                 return false;
@@ -51,6 +54,7 @@ public class CameraEngineInterface {
                 camera = Camera.open(id);
                 cameraID = id;
                 setDefaultParameters();
+        //camera.setDisplayOrientation(270);
                 return true;
             }catch(RuntimeException e){
                 return false;
@@ -93,6 +97,32 @@ public class CameraEngineInterface {
         startPreview(surfaceTexture);
     }
 
+     public void setCameraDisplayOrientation() {
+          Camera.CameraInfo info = new Camera.CameraInfo();
+          Camera.getCameraInfo(cameraID, info);
+          int result=0;
+          Log.d(TAG,"info.orientation = "+info.orientation);
+          if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+          Log.d(TAG,"info.facing = "+info.facing);
+              if(info.orientation==90){//qian_amaza
+                   result = (360 - result) % 360;  // compensate the mirror
+	      }else if(info.orientation==270){//qian_lg
+                   result = (360 + result) % 360;  // compensate the mirror
+	      }
+             // result = info.orientation;
+              Log.d(TAG,"result1 = "+result);
+
+          } else {  // back-facing
+              if(info.orientation==90){
+              result = (info.orientation + 360-90) % 360;
+              }else if(info.orientation==270){
+              result = (info.orientation + 360-270) % 360;
+              }
+              Log.d(TAG,"result2 = "+result);
+          }
+          camera.setDisplayOrientation(result);
+      }
+
     private  void setDefaultParameters(){
         parameters = camera.getParameters();
         if (parameters.getSupportedFocusModes().contains(
@@ -103,7 +133,8 @@ public class CameraEngineInterface {
         parameters.setPreviewSize(previewSize.width, previewSize.height);
         Size pictureSize = CameraUtils.getLargePictureSize(camera);
         parameters.setPictureSize(pictureSize.width, pictureSize.height);
-        parameters.setRotation(90);
+        //parameters.setRotation(90);
+        setCameraDisplayOrientation();
         camera.setParameters(parameters);
     }
 
@@ -121,14 +152,16 @@ public class CameraEngineInterface {
 		parameters.setPreviewSize(previewSize.width, previewSize.height);
 		pictureSize = CameraUtils.getLargePictureSize(camera);
 		parameters.setPictureSize(pictureSize.width, pictureSize.height);
-		parameters.setRotation(90);
+        setCameraDisplayOrientation();
+		//parameters.setRotation(90);
 		camera.setParameters(parameters);
         }else{
 		previewSize = CameraUtils.getLargePreviewSize_16_9(camera);
 		parameters.setPreviewSize(previewSize.width, previewSize.height);
 		pictureSize = CameraUtils.getLargePictureSize_16_9(camera);
 		parameters.setPictureSize(pictureSize.width, pictureSize.height);
-		parameters.setRotation(90);
+		//parameters.setRotation(90);
+        setCameraDisplayOrientation();
 		camera.setParameters(parameters);
         }
     }

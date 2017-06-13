@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/camera_controls_auxiliary_line_layout"   
+	android:layout_width="fill_parent"  
+	android:layout_height="wrap_content"
+	android:visibility="visible"
+	android:gravity="center"
+	android:orientation="horizontal">
+
+	<googlog.com.hsscamera.widget.AuxiliarylineControls
+		android:id="@+id/camera_controls_auxiliary_line"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" >
+		<ImageView
+			android:id="@+id/camera_controls_auxiliary_line_image"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:clickable="false"
+			android:focusable="false"
+			android:visibility="visible"/>
+
+	</googlog.com.hsscamera.widget.AuxiliarylineControls>
+</FrameLayout>
